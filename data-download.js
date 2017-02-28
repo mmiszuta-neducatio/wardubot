@@ -5,7 +5,10 @@ var express         = require("express"),
     fs              = require('fs'),
     tinyreq         = require("tinyreq"),
     cheerio         = require("cheerio"),
-    request         = require("request");
+    request         = require("request"),
+    Images          = require("./models/images.js");
+
+mongoose.connect("mongodb://mongo:27017/wardubot");
 
 //TODO export to middleware all the external functions
 var attrScraper = function($, needle, needleAttr){
@@ -34,7 +37,6 @@ var downloadImage = function(uri, filename, callback){
 };
 //end of external functions
 
-mongoose.connect("mongodb://mongo:27017/wardubot");
 var baseUrl               = "http://www.biedronka.pl"
 var url                   = "http://www.biedronka.pl/pl/twoja-piekna-kuchnia-27-02";
 var completeProductsHrefs  = [];
@@ -54,10 +56,22 @@ tinyreq(url, function(error, body){
       productPriceTotal = (productsPricesPln[i] + "," + productsPricesGr[i] + " zł");
     };
 
-    for (var i=0; i< productsImageLinks.length; i++){
-      downloadImage({url: productsImageLinks[i], headers: {'User-Agent': 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:51.0) Gecko/20100101 Firefox/51.0', 'Referer': 'http://www.biedronka.pl/pl', 'Content-Type': 'image/jpeg'}}, 'biedra' + i + '.jpg', function(){
+
+    //empty collection on Images schema
+    Images.remove(function(err){
+      if(err) throw err;
+    });
+    for (var i=0; i < productsImageLinks.length; i++){
+      var pathToImage = './images/biedra' + i + '.jpg';
+      downloadImage({url: productsImageLinks[i], headers: {'User-Agent': 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:51.0) Gecko/20100101 Firefox/51.0', 'Referer': 'http://www.biedronka.pl/pl', 'Content-Type': 'image/jpeg'}}, pathToImage, function(){
+        var imageDB = new Images();
+        imageDB.img.data = fs.readFileSync(pathToImage);
+        imageDB.img.contentType = 'image/jpeg';
+        imageDB.save(function(err, imageDB) {
+          if(err) throw err;
+          console.error('saved img to mongo');
+        });
         console.log('done');
       });
     }
-
 });
