@@ -39,10 +39,10 @@ tinyreq(url, function(error, body){
     for(var i = 0; i < incompleteProductsHrefs.length; i++) {
       completeProductHrefs.push(baseUrl + incompleteProductsHrefs[i]);
     }
-    console.log(completeProductHrefs);
-    // var result = $.map(productPricePln, function(value, index){
-    //   return[value, productPriceGr[index]];
-    // });
+
+    for (var i=0; i< productPricePln.length; i++){
+      productPriceTotal = (productPricePln[i] + "," + productPriceGr[i] + " zł");
+    };
 });
 
 
