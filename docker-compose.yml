@@ -1,0 +1,22 @@
+version: '2'
+
+services:
+  app:
+    container_name: node-slackbot
+    image: node:latest
+    volumes:
+      - ".:/slackbot"
+    working_dir: /slackbot
+    tty: true
+    stdin_open: true
+  db:
+    container_name: mongo-slackbot
+    image: mongo:latest
+    ports:
+      - "0.0.0.0:27017:27017"
+    volumes:
+      - data_db:/database
+    tty: true
+    stdin_open: true
+volumes:
+  data_db: {}
