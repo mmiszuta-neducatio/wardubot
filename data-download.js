@@ -1,54 +1,49 @@
 var express         = require("express"),
     app             = express(),
     mongoose        = require("mongoose"),
-    http            = require('http'),
+    http            = require("http"),
     fs              = require('fs'),
     tinyreq         = require("tinyreq"),
     cheerio         = require("cheerio");
 
+//TODO export to middleware all the external functions
+var attrScraper = function($, needle, needleAttr){
+  var arrayOfAttributes = [];
+  needle.each(function(index, value){
+    arrayOfAttributes.push($(value).attr(needleAttr));
+  });
+  return arrayOfAttributes;
+}
 
+var textScraper = function($, needle){
+  var arrayOfAttributes = [];
+  needle.each(function(index, value){
+    arrayOfAttributes.push($(value).text());
+  });
+  return arrayOfAttributes;
+}
+//end of external functions
 
-mongoose.connect("mongodb://localhost/slackbot");
-
-
-var url = "http://www.biedronka.pl/pl/twoja-piekna-kuchnia-27-02";
+mongoose.connect("mongodb://mongo:27017/wardubot");
+var baseUrl               = "http://www.biedronka.pl"
+var url                   = "http://www.biedronka.pl/pl/twoja-piekna-kuchnia-27-02";
+var completeProductHrefs  = [];
 tinyreq(url, function(error, body){
-  //console.log(body)
+
     var $ = cheerio.load(body);
-    var productImage = [];
-    var productImageTags = $(".productsimple-default img").each(function(index, value){
-      productImage.push($(value).attr('src'))
-    });
-    var productName = [];
-    var productTags = $(".productsimple-default img").each(function(index, value){
-      productName.push($(value).attr('alt'))
-    });
-//console.log(producName);
-    var productPricePln = [];
-    var productPriceTags = $(".pln").each(function(index, value){
-      productPricePln.push($(value).text());
+    var productsImageLinks      = attrScraper($, $(".productsimple-default img"), "src");
+    var productsNames           = attrScraper($, $(".productsimple-default img"), "alt");
+    var incompleteProductsHrefs = attrScraper($, $(".productsimple-default a"), "href");
+    var productsPricesPln       = textScraper($, $(".pln"));
+    var productsPricesGr        = textScraper($, $(".gr"));
+    for(var i = 0; i < incompleteProductsHrefs.length; i++) {
+      completeProductHrefs.push(baseUrl + incompleteProductsHrefs[i]);
+    }
+    console.log(completeProductHrefs);
+    // var result = $.map(productPricePln, function(value, index){
+    //   return[value, productPriceGr[index]];
+    // });
 });
-//console.log(productPrice);
-    var productPriceGr = [];
-    var productPriceTags = $(".gr").each(function(index, value){
-      productPriceGr.push($(value).text());
-
-});
-//  console.log(productPriceGr);
-    var productImageLinks = [];
-    var productImageTags = $(".productsimple-default a").each(function(index, value){
-      productImageLinks.push($(value).attr('href'));
-});
-//console.log(productImageLinks);
-
-    var result = $.map(productPricePln, function(value, index){
-      return[value, productPriceGr[index]];
-    });
-
-});
-
-
-
 
 
 // var file = fs.createWriteStream("file.jpg");

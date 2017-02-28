@@ -9,14 +9,15 @@ services:
     working_dir: /slackbot
     tty: true
     stdin_open: true
-  db:
-    container_name: mongo-slackbot
+  mongodata:
     image: mongo:latest
-    ports:
-      - "0.0.0.0:27017:27017"
     volumes:
-      - data_db:/database
-    tty: true
-    stdin_open: true
-volumes:
-  data_db: {}
+      - /data/db
+    command: --break-mongo
+  mongo:
+    image: mongo:latest
+    volumes_from:
+      - mongodata
+    ports:
+      - "27017:27017"
+    command: --smallfiles --rest --auth
