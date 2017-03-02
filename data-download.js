@@ -62,14 +62,32 @@ tinyreq(url, function(error, body){
   }
 
   for (var i=0; i< productsPricesPln.length; i++){
-    productsPricesTotal.push(productsPricesPln[i] + "," + productsPricesGr[i] + " zł");
+    productsPricesTotal.push(productsPricesPln[i] + "," + productsPricesGr[i] + " pln");
   };
-
-
   //empty collection on Images schema
   Images.remove(function(err){
     if(err) throw err;
   });
+  var createRectangles = function(iterator, callback){
+    Jimp.read("./assets/yellow.png", function(err, bar){
+      if (err) throw err;
+      bar.resize(69,20).write('./images/yellowBar' + iterator + '.png');
+      callback();
+    });
+  };
+  var EditImages = function(path, iterator){
+    Jimp.read(path, function(err, img){
+      if(err) throw err;
+      Jimp.loadFont(Jimp.FONT_SANS_16_BLACK).then(function(font){
+        Jimp.read('./images/yellowBar' + iterator + '.png', function(err, bar){
+          if(err) throw err;
+          img.composite(bar, 10,10)
+          .print(font, 10,10, productsPricesTotal[iterator])
+          .write('./images/edited' + iterator + '.jpg');
+        });
+      });
+    });
+  }
   var counter = 0;
   var pathToRawImages = [];
   async.each(productsImageLinks, function(link, callback){
@@ -77,30 +95,17 @@ tinyreq(url, function(error, body){
     pathToRawImages.push(pathToRawImage);
     downloadImage({url: link, headers: {'User-Agent': 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:51.0) Gecko/20100101 Firefox/51.0', 'Referer': 'http://www.biedronka.pl/pl', 'Content-Type': 'image/jpeg'}}, pathToRawImage, callback);
   }, function(err){
-    console.log('finished');
-    console.log(counter);
-    // if (err) throw err;
-    // console.log(pathToRawImage);
-    // console.log(counter);
-    // var pathToImageWithText = "./images/text"
-    var counterForPrices = 0;
-    var EditImages = function(path, iterator){
-      Jimp.read(path, function(err, img){
-        console.log(iterator + " in Jimp read");
-        if(err) throw err;
-        Jimp.loadFont(Jimp.FONT_SANS_16_BLACK).then(function(font){
-          console.log(iterator + " in Jimp load font");
-          //console.log(productsPricesTotal);
-          img.print(font, 10,10, productsPricesTotal[iterator])
-          .write("./images/edited" + iterator + ".jpg");
-        });
-      });
-    }
+    counter = 0;
     async.each(pathToRawImages, function(pathToImage, callback){
-      EditImages(pathToImage, counterForPrices);
-      //console.log(productsPricesTotal);
-      console.log(counterForPrices + " under Jimp");
-      counterForPrices++;
+      createRectangles(counter, callback);
+      counter++;
+    }, function(err){
+      if (err) throw err;
+      counter = 0;
+      async.each(pathToRawImages, function(pathToImage, callback){
+        EditImages(pathToImage, counter);
+        counter++;
+      });
     });
   });
 });
