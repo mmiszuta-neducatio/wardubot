@@ -11,7 +11,7 @@ Jimp            = require("jimp"),
 async           = require("async");
 
 
-mongoose.connect("mongodb://mongo:27017/wardubot");
+//mongoose.connect("mongodb://mongo:27017/wardubot");
 
 //TODO export to middleware all the external functions
 var attrScraper = function($, needle, needleAttr){
@@ -32,14 +32,19 @@ var textScraper = function($, needle){
 
 
 var downloadImage = function(uri, filename, callback){
+  var dir = './images';
+  if(!fs.existsSync(dir)){
+    fs.mkdirSync(dir);
+  }
   request.head(uri, function(err, res, body){
     console.log('content-type:', res.headers['content-type']);
     console.log('content-length:', res.headers['content-length']);
 
     var req = request(uri).pipe(fs.createWriteStream(filename));
-    req.on('finish', function(){
-      req.close();
-      callback();
+    req.on('error', function(err){throw err})
+       .on('finish', function(err){
+       req.close();
+       callback();
     });
   });
 };
@@ -65,9 +70,9 @@ tinyreq(url, function(error, body){
     productsPricesTotal.push(productsPricesPln[i] + "," + productsPricesGr[i] + " pln");
   };
   //empty collection on Images schema
-  Images.remove(function(err){
-    if(err) throw err;
-  });
+//  Images.remove(function(err){
+//    if(err) throw err;
+//  });
   var createRectangles = function(iterator, callback){
     Jimp.read("./assets/yellow.png", function(err, bar){
       if (err) throw err;
