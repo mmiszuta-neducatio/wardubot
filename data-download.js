@@ -1,28 +1,34 @@
 /*jslint node: true */
 "use strict";
 
-var tinyreq               = require("tinyreq");
+var tinyreq                 = require("tinyreq");
 var cheerio                 = require("cheerio");
 var async                   = require("async");
 var imageHelper             = require("./lib/imageHelper.js");
 var scrapeHelper            = require("./lib/scrapeHelper.js");
 
 var baseUrl                 = "http://www.biedronka.pl";
-var url                     = "http://www.biedronka.pl/pl/twoja-piekna-kuchnia-27-02";
 var completeProductsHrefs   = [];
 var productsPricesTotal     = [];
 var completePromotionsLinks = [];
+var counter                 = 0;
+var pathToRawImages         = [];
 
-tinyreq(baseUrl, function(err, body){
-  if(err) {throw err;}
-  var $ = cheerio.load(body);
-  var incompletePromotionsLinks = scrapeHelper.getAttribute($, $("a[title=\"Akcje Tematyczne\"]").next().find('a'), "href");
 
-  for(var i = 0; i < incompletePromotionsLinks.length; i++) {
-    completePromotionsLinks.push(baseUrl + incompletePromotionsLinks[i]);
-  }
-});
-tinyreq(url, function(err, body){
+async.waterfall([function(cb){
+  tinyreq(baseUrl, function(err, body){
+    if(err) {throw err;}
+    var $ = cheerio.load(body);
+    var incompletePromotionsLinks = scrapeHelper.getAttribute($, $("a[title=\"Akcje Tematyczne\"]").next().find('a'), "href");
+
+    for(var i = 0; i < incompletePromotionsLinks.length; i++) {
+      completePromotionsLinks.push(baseUrl + incompletePromotionsLinks[i]);
+    }
+    cb(null, completePromotionsLinks);
+  });
+},
+function(promoLinks, cb){
+  tinyreq(promoLinks[0], function(err, body){
   if(err) {throw err;}
   var $ = cheerio.load(body);
   var productsImageLinks      = scrapeHelper.getAttribute($, $(".productsimple-default img"), "src");
@@ -38,25 +44,47 @@ tinyreq(url, function(err, body){
     productsPricesTotal.push(productsPricesPln[i] + "," + productsPricesGr[i] + " pln");
   }
 
-  var counter = 0;
-  var pathToRawImages = [];
-  async.each(productsImageLinks, function(link, callback){
-    var pathToRawImage = "./images/raw" + counter++ + ".jpg";
-    pathToRawImages.push(pathToRawImage);
-    imageHelper.downloadImage({url: link, headers: {'User-Agent': 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:51.0) Gecko/20100101 Firefox/51.0', 'Referer': 'http://www.biedronka.pl/pl', 'Content-Type': 'image/jpeg'}}, pathToRawImage, callback);
-  }, function(err){
-    if(err) {throw err;}
-    counter = 0;
-    async.each(pathToRawImages, function(pathToImage, callback){
-      imageHelper.createRectangles(counter, callback);
-      counter++;
-    }, function(err){
-      if (err) {throw err;}
-      counter = 0;
-      async.each(pathToRawImages, function(pathToImage){
-        imageHelper.EditImages(pathToImage, counter, productsPricesTotal);
+  var dlAll = function(){
+      async.each(productsImageLinks, function(link, callback){
+        var pathToRawImage = "./images/raw" + counter++ + ".jpg";
+        pathToRawImages.push(pathToRawImage);
+        imageHelper.downloadImage({url: link, headers: {'User-Agent': 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:51.0) Gecko/20100101 Firefox/51.0', 'Referer': 'http://www.biedronka.pl/pl', 'Content-Type': 'image/jpeg'}}, pathToRawImage, callback);
+      });
+  };
+  var createAllRectangles = function(){
+     var counter = 0;
+     async.each(pathToRawImages, function(pathToRawImage, callback){
+        imageHelper.createRectangles(counter, callback);
         counter++;
       });
-    });
+  };
+
+  var editAll = function(){
+    var counter = 0;
+    async.each(pathToRawImages, function(pathToImage, callback){
+      imageHelper.EditImages(pathToImage, counter, productsPricesTotal, callback);
+      counter++;
+      });
+  };
+
+
+  async.series([
+    function(cb){
+          cb(dlAll());
+    },
+    function(cb){
+      setTimeout(function(){
+        cb(createAllRectangles());
+      }, 5500);
+    }, 
+    function(cb){
+        setTimeout(function(){
+          cb(editAll());
+        }, 5500);
+    }]);
+    cb();
   });
-});
+}]);
+
+
+
