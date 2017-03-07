@@ -2,16 +2,26 @@
 "use strict";
 
 var tinyreq               = require("tinyreq");
-var cheerio               = require("cheerio");
-var async                 = require("async");
-var imageHelper           = require("./lib/imageHelper.js");
-var scrapeHelper          = require("./lib/scrapeHelper.js");
+var cheerio                 = require("cheerio");
+var async                   = require("async");
+var imageHelper             = require("./lib/imageHelper.js");
+var scrapeHelper            = require("./lib/scrapeHelper.js");
 
-var baseUrl               = "http://www.biedronka.pl";
-var url                   = "http://www.biedronka.pl/pl/twoja-piekna-kuchnia-27-02";
-var completeProductsHrefs = [];
-var productsPricesTotal   = [];
+var baseUrl                 = "http://www.biedronka.pl";
+var url                     = "http://www.biedronka.pl/pl/twoja-piekna-kuchnia-27-02";
+var completeProductsHrefs   = [];
+var productsPricesTotal     = [];
+var completePromotionsLinks = [];
 
+tinyreq(baseUrl, function(err, body){
+  if(err) {throw err;}
+  var $ = cheerio.load(body);
+  var incompletePromotionsLinks = scrapeHelper.getAttribute($, $("a[title=\"Akcje Tematyczne\"]").next().find('a'), "href");
+
+  for(var i = 0; i < incompletePromotionsLinks.length; i++) {
+    completePromotionsLinks.push(baseUrl + incompletePromotionsLinks[i]);
+  }
+});
 tinyreq(url, function(err, body){
   if(err) {throw err;}
   var $ = cheerio.load(body);
@@ -19,6 +29,7 @@ tinyreq(url, function(err, body){
   var incompleteProductsHrefs = scrapeHelper.getAttribute($, $(".productsimple-default a"), "href");
   var productsPricesPln       = scrapeHelper.getText($, $(".pln"));
   var productsPricesGr        = scrapeHelper.getText($, $(".gr"));
+  
   for(var i = 0; i < incompleteProductsHrefs.length; i++) {
     completeProductsHrefs.push(baseUrl + incompleteProductsHrefs[i]);
   }
