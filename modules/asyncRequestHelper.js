@@ -60,8 +60,8 @@ module.exports = {
       }],
         function(){
         console.log('done');
+        callback(null, completeProductsHrefs);
       });
     });
-    callback();
   }
 };

@@ -29,7 +29,7 @@ var naturalCompare = function(a, b) {
 
 
 var removeOldImages = function(){
-  var path = './images/';
+  var path = './images/raw/';
   var filesToRemove = fs.readdirSync(path);
   filesToRemove.sort(naturalCompare);
   console.log(filesToRemove);
@@ -40,18 +40,20 @@ var removeOldImages = function(){
 //removeOldImages();
 
 var cloudUpload = function(){
-  var path = './ready/';
+  var path = './images/imagesWithPrice/';
   var allImages = fs.readdirSync(path);
   allImages.sort(naturalCompare);
+  var botLinksArray = [];
   for (var i = 0; i < 4; i++ )
   cloudinary.uploader.upload(path + allImages[i], function(res){
-  console.log(res.url);
+  botLinksArray.push(res.url);
   });
+  return botLinksArray;
 }
- cloudUpload();
+// cloudUpload();
 
 var removeUploadedFiles = function(){
-  var path = './ready/';
+  var path = './images/imagesWithPrice/';
   var allImages = fs.readdirSync(path);
   allImages.sort(naturalCompare);
   var uploadedFiles = allImages.slice(0,4);
@@ -60,6 +62,8 @@ var removeUploadedFiles = function(){
   });
 }
 //removeUploadedFiles();
+
+
 var bot = new slackbot({
   token: 'xoxb-147510149990-4eWVk2f0dafCDlwTDSVBZDkH',
   name : 'Wardubot'
@@ -67,7 +71,7 @@ var bot = new slackbot({
 
 bot.on('start', function(){
   var params = {
-    author_icon: 'https://media.licdn.com/mpr/mpr/shrinknp_400_400/AAEAAQAAAAAAAAfqAAAAJGM4ZTQyMzU0LTM5YTktNDFhZi1hMGJhLWNiYTkyYjBlMzRjZg.jpg'
+    icon_emoji: ':cat:'
   };
   bot.postMessageToChannel('general', 'http://res.cloudinary.com/doj3kuv7g/image/upload/v1488985914/b8slth7nvsjmltcutgkr.jpg', params);
 });
