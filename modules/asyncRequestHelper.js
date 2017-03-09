@@ -34,7 +34,7 @@ module.exports = {
       var incompleteProductsHrefs = scrapeHelper.getAttribute($, $(".productsimple-default a"), "href");
       var productsPricesPln       = scrapeHelper.getText($, $(".pln"));
       var productsPricesGr        = scrapeHelper.getText($, $(".gr"));
-  
+
       for(var i = 0; i < incompleteProductsHrefs.length; i++) {
         completeProductsHrefs.push(baseUrl + incompleteProductsHrefs[i]);
       }
@@ -43,21 +43,20 @@ module.exports = {
         productsPricesTotal.push(productsPricesPln[i] + "," + productsPricesGr[i] + " pln");
       }
 
-      async.waterfall([
+      async.series([
         function(next){
+          console.log('Downloading images, please wait');
           asyncImageHelper.downloadAll(productsImageLinks, next);
       },
       function(next){
-        setTimeout(function(){
+        console.log('creating price bars');
           asyncImageHelper.createAllRectangles(next);
-        }, 3000);
       },
       function(next){
-        setTimeout(function(){
+        console.log('creating images with price bars');
           asyncImageHelper.editAll(productsPricesTotal, next);
-        }, 4500);
-      
-      }], 
+
+      }],
         function(){
         console.log('done');
       });
@@ -65,4 +64,3 @@ module.exports = {
     callback();
   }
 };
-
