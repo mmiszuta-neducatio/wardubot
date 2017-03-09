@@ -6,12 +6,12 @@ var reqHelper = require("./modules/asyncRequestHelper.js");
 var fs = require("fs");
 var cloudinary = require('cloudinary');
 var slackbot = require('slackbots');
-
+var sortMethod = require('./lib/naturalCompare.js');
 var getMyUrls = function(path, filenames, myUrl){
 
 }
 
-var cloudUpload = function(callback){
+var cloudUpload = function(productsLinks, callback){
   cloudinary.config({
     cloud_name: 'doj3kuv7g',
     api_key   : '873865247332359',
@@ -19,28 +19,34 @@ var cloudUpload = function(callback){
   });
   var path = './images/imagesWithPrice/';
   var allImages = fs.readdirSync(path);
-  allImages.sort(naturalCompare);
+  allImages.sort(sortMethod.naturalCompare);
+  var imagesToUpload = allImages.slice(0, 4);
   var urlsForSlack = [];
-  for (var i = 0; i < 4; i++) {
-    cloudinary.uploader.upload(path + allImages[i], function(res){
+  async.eachSeries(imagesToUpload, function(image, cb){
+    cloudinary.uploader.upload(path + image, function(res){
        urlsForSlack.push(res.url);
-       callback(null, urlsForSlack);
+       cb();
      });
-  }
-
+  }, function(){
+    callback(null, productsLinks, urlsForSlack);
+  });
 }
+
 var start = function(urlLinksArray, imageLinksArray){
   var bot = new slackbot({
     token: 'xoxb-147510149990-sYrycOgprS0XFpGbUaXbxocv',
     name : 'Wardubot'
   });
   bot.on('start', function(){
+    console.log('started bot');
     var params = {
       icon_emoji: ':cat:'
     };
     for(var i=0 ;i<4; i++){
-      bot.postMessageToChannel('general', imageLinksArray[i], params);
-      bot.postMessageToChannel('general', urlLinksArray[i], params);
+      bot.postMessageToChannel('general', imageLinksArray[i] + "\n" + urlLinksArray[i], params);
+      // setTimeout(function(){
+      //   bot.postMessageToChannel('general', urlLinksArray[i], params)
+      // }, 100);
     }
   });
   //console.log(imageLinksArray);
@@ -52,21 +58,7 @@ var deleteUploadedLinks = function(productsUrls){
   console.log(productsUrls);
   };
 
-  var naturalCompare = function(a, b) {
-    var ax = [], bx = [];
 
-        a.replace(/(\d+)|(\D+)/g, function(_, $1, $2) { ax.push([$1 || Infinity, $2 || ""]);});
-        b.replace(/(\d+)|(\D+)/g, function(_, $1, $2) { bx.push([$1 || Infinity, $2 || ""]);});
-
-        while(ax.length && bx.length) {
-                  var an = ax.shift();
-                  var bn = bx.shift();
-                  var nn = (an[0] - bn[0]) || an[1].localeCompare(bn[1]);
-                  if(nn) {return nn;}
-              }
-
-        return ax.length - bx.length;
-  };
 
 
 async.waterfall([function(cb){
@@ -84,8 +76,7 @@ function(productsLinks, cb){
   //zawrzeć tutaj funkcję, która będzie zawierać: wrzucenie na hosting, usunięcie wrzuconych, wysłanie linków obrazków na slacka,
   //wysłanie linków do produktów pod obrazkami na slacka, usunięcie wrzuconych linków do produktów z arraya
   cloudUpload(productsLinks, cb);
-  start(productsLinks, imagesLinks);
 },
-function(){
-
+function(productsLinks, imagesForSlack, cb){
+    start(productsLinks, imagesForSlack);
 }]);

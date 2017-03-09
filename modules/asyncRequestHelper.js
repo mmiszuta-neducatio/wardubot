@@ -39,11 +39,12 @@ module.exports = {
       for(var i = 0; i < incompleteProductsHrefs.length; i++) {
         completeProductsHrefs.push(baseUrl + incompleteProductsHrefs[i]);
       }
-
+      console.log(productsImageLinks);
+      console.log(completeProductsHrefs);
       for (i=0; i < productsPricesPln.length; i++){
         productsPricesTotal.push(productsPricesPln[i] + "," + productsPricesGr[i] + " pln");
       }
-
+      console.log(productsPricesTotal);
       async.series([
         function(next){
           console.log('Downloading images, please wait');
