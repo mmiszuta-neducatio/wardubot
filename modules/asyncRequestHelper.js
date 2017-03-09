@@ -5,6 +5,7 @@ var async             = require("async");
 var tinyreq           = require("tinyreq");
 var cheerio           = require("cheerio");
 var scrapeHelper      = require("../lib/scrapeHelper.js");
+var imageHelper       = require("../lib/imageHelper.js");
 var asyncImageHelper  = require("./asyncImageHelper.js");
 
 module.exports = {
@@ -50,7 +51,7 @@ module.exports = {
       },
       function(next){
         console.log('creating price bars');
-          asyncImageHelper.createAllRectangles(next);
+          imageHelper.createRectangle(next);
       },
       function(next){
         console.log('creating images with price bars');

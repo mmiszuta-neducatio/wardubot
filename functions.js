@@ -7,7 +7,7 @@ var slackbot = require('slackbots');
 
 cloudinary.config({
   cloud_name: 'doj3kuv7g',
-  api_key: '873865247332359',
+  api_key   : '873865247332359',
   api_secret: 'fradOYWi4QmE8hDV9CP1yzgbj_M'
 });
 
@@ -62,7 +62,7 @@ var removeUploadedFiles = function(){
 //removeUploadedFiles();
 var bot = new slackbot({
   token: 'xoxb-147510149990-4eWVk2f0dafCDlwTDSVBZDkH',
-  name: 'Wardubot'
+  name : 'Wardubot'
 });
 
 bot.on('start', function(){
