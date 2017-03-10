@@ -7,34 +7,14 @@ var fs = require("fs");
 var cloudinary = require('cloudinary');
 var slackbot = require('slackbots');
 var sortMethod = require('./lib/naturalCompare.js');
-var getMyUrls = function(path, filenames, myUrl){
+var schedule = require('node-schedule');
 
-}
 
-var cloudUpload = function(productsLinks, callback){
-  cloudinary.config({
-    cloud_name: 'doj3kuv7g',
-    api_key   : '873865247332359',
-    api_secret: 'fradOYWi4QmE8hDV9CP1yzgbj_M'
-  });
-  var path = './images/imagesWithPrice/';
-  var allImages = fs.readdirSync(path);
-  allImages.sort(sortMethod.naturalCompare);
-  var imagesToUpload = allImages.slice(0, 4);
-  var urlsForSlack = [];
-  async.eachSeries(imagesToUpload, function(image, cb){
-    cloudinary.uploader.upload(path + image, function(res){
-       urlsForSlack.push(res.url);
-       cb();
-     });
-  }, function(){
-    callback(null, productsLinks, urlsForSlack);
-  });
-}
 
-var start = function(urlLinksArray, imageLinksArray){
+
+var start = function(productForSlack){
   var bot = new slackbot({
-    token: 'xoxb-147510149990-sYrycOgprS0XFpGbUaXbxocv',
+    token: 'xoxb-147510149990-kFvZ9AIbGVQ9xFM4EtK4zZa0',
     name : 'Wardubot'
   });
   bot.on('start', function(){
@@ -42,41 +22,33 @@ var start = function(urlLinksArray, imageLinksArray){
     var params = {
       icon_emoji: ':cat:'
     };
+
     for(var i=0 ;i<4; i++){
-      bot.postMessageToChannel('general', imageLinksArray[i] + "\n" + urlLinksArray[i], params);
-      // setTimeout(function(){
-      //   bot.postMessageToChannel('general', urlLinksArray[i], params)
-      // }, 100);
+      bot.postMessageToChannel('general', productForSlack[i].imgUrl + "\n" + productForSlack[i].productLink, params);
     }
+
   });
-  //console.log(imageLinksArray);
-  //deleteUploadedLinks(urlLinksArray);
+  //urlLinksArray.splice(0,4);
 }
-var deleteUploadedLinks = function(productsUrls){
-  console.log(productsUrls);
-  productsUrls.splice(0,4);
-  console.log(productsUrls);
-  };
 
+// var rule = new schedule.RecurrenceRule();
+// rule.minute = 26;
 
+console.log('initializing schedule');
 
-
-async.waterfall([function(cb){
-  console.log('waterfall 1');
-  //preparationRequest callback returns array of links to promotions on biedronka.pl
-  reqHelper.preparationRequest(cb);
-},
-function(promoLinks, cb){
-  console.log('waterfall 2');
-  //mainRequest callback returns array of links to every discounted product on biedronka.pl
-  reqHelper.mainRequest(promoLinks[0], cb);
-},
-function(productsLinks, cb){
-  console.log('waterfall 3');
-  //zawrzeć tutaj funkcję, która będzie zawierać: wrzucenie na hosting, usunięcie wrzuconych, wysłanie linków obrazków na slacka,
-  //wysłanie linków do produktów pod obrazkami na slacka, usunięcie wrzuconych linków do produktów z arraya
-  cloudUpload(productsLinks, cb);
-},
-function(productsLinks, imagesForSlack, cb){
-    start(productsLinks, imagesForSlack);
-}]);
+//schedule.scheduleJob(rule, function(){
+  console.log('schedule initialized');
+  async.waterfall([function(cb){
+    console.log('waterfall 1');
+    //preparationRequest callback returns array of links to promotions on biedronka.pl
+    reqHelper.preparationRequest(cb);
+  },
+  function(promoLinks, cb){
+    console.log('waterfall 2');
+    //mainRequest callback returns array of links to every discounted product on biedronka.pl
+    reqHelper.mainRequest(promoLinks[0], cb);
+  },
+  function(productForSlack, cb){
+      start(productForSlack);
+  }]);
+//});

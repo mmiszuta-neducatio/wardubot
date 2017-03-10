@@ -7,6 +7,10 @@ var cheerio           = require("cheerio");
 var scrapeHelper      = require("../lib/scrapeHelper.js");
 var imageHelper       = require("../lib/imageHelper.js");
 var asyncImageHelper  = require("./asyncImageHelper.js");
+var uploader          = require("../lib/uploader.js");
+
+
+
 
 module.exports = {
   preparationRequest: function(callback){
@@ -17,9 +21,12 @@ module.exports = {
       if(err) {throw err;}
       var $ = cheerio.load(body);
       var incompletePromotionsLinks = scrapeHelper.getAttribute($, $("a[title=\"Akcje Tematyczne\"]").next().find('a'), "href");
-
+      var promotionsTexts = scrapeHelper.getText($, $("a[title=\"Akcje Tematyczne\"]").next().find('a'));
+      var regex = new RegExp('.*[0-9]{2}\.[0-9]{2}');
       for(var i = 0; i < incompletePromotionsLinks.length; i++) {
+        if(regex.test(promotionsTexts[i])){
         completePromotionsLinks.push(baseUrl + incompletePromotionsLinks[i]);
+        }
       }
       callback(null, completePromotionsLinks);
     });
@@ -39,16 +46,15 @@ module.exports = {
       for(var i = 0; i < incompleteProductsHrefs.length; i++) {
         completeProductsHrefs.push(baseUrl + incompleteProductsHrefs[i]);
       }
-      console.log(productsImageLinks);
-      console.log(completeProductsHrefs);
+
       for (i=0; i < productsPricesPln.length; i++){
         productsPricesTotal.push(productsPricesPln[i] + "," + productsPricesGr[i] + " pln");
       }
-      console.log(productsPricesTotal);
+
       async.series([
         function(next){
-          console.log('Downloading images, please wait');
-          asyncImageHelper.downloadAll(productsImageLinks, next);
+            console.log('Downloading images, please wait');
+            asyncImageHelper.downloadAll(productsImageLinks, next);
       },
       function(next){
         console.log('creating price bars');
@@ -56,13 +62,33 @@ module.exports = {
       },
       function(next){
         console.log('creating images with price bars');
-          asyncImageHelper.editAll(productsPricesTotal, next);
-
+        asyncImageHelper.editAll(productsPricesTotal, next);
+      },
+      function(next){
+        uploader.cloudUpload(next);
       }],
-        function(){
-        console.log('done');
-        callback(null, completeProductsHrefs);
+      function(imageUrlsForSlack){
+
+        var productsForSlack = [];
+        var counter = 0;
+        async.eachSeries(imageUrlsForSlack, function(imageUrl, cb){
+            addProductDataToArray(productsForSlack, counter++, imageUrl, completeProductsHrefs, cb);
+        }, function(){
+          console.log('done');
+          callback(null, productsForSlack);
+        });
       });
     });
   }
 };
+
+var addProductDataToArray = function(arrayForProducts, counter, urlsForSlack, productsLinks, callback){
+  function productDataForSlack(id, cloudinaryUrl, productLink)
+  {
+    this.id = id;
+    this.imgUrl = cloudinaryUrl;
+    this.productLink = productLink;
+  }
+  arrayForProducts.push(new productDataForSlack(counter, urlsForSlack, productsLinks[counter]));
+  callback();
+}
