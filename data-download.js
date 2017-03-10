@@ -14,7 +14,7 @@ var schedule = require('node-schedule');
 
 var start = function(productForSlack){
   var bot = new slackbot({
-    token: 'xoxb-147510149990-kFvZ9AIbGVQ9xFM4EtK4zZa0',
+    token: '',
     name : 'Wardubot'
   });
   bot.on('start', function(){

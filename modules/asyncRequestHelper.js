@@ -25,7 +25,7 @@ module.exports = {
       var regex = new RegExp('.*[0-9]{2}\.[0-9]{2}');
       for(var i = 0; i < incompletePromotionsLinks.length; i++) {
         if(regex.test(promotionsTexts[i])){
-        completePromotionsLinks.push(baseUrl + incompletePromotionsLinks[i]);
+          completePromotionsLinks.push(baseUrl + incompletePromotionsLinks[i]);
         }
       }
       callback(null, completePromotionsLinks);
@@ -53,42 +53,42 @@ module.exports = {
 
       async.series([
         function(next){
-            console.log('Downloading images, please wait');
-            asyncImageHelper.downloadAll(productsImageLinks, next);
-      },
-      function(next){
-        console.log('creating price bars');
+          console.log('Downloading images, please wait');
+          asyncImageHelper.downloadAll(productsImageLinks, next);
+        },
+        function(next){
+          console.log('creating price bars');
           imageHelper.createRectangle(next);
-      },
-      function(next){
-        console.log('creating images with price bars');
-        asyncImageHelper.editAll(productsPricesTotal, next);
-      },
-      function(next){
-        uploader.cloudUpload(next);
-      }],
-      function(imageUrlsForSlack){
+        },
+        function(next){
+          console.log('creating images with price bars');
+          asyncImageHelper.editAll(productsPricesTotal, next);
+        },
+        function(next){
+          uploader.cloudUpload(next);
+        }],
+        function(imageUrlsForSlack){
 
-        var productsForSlack = [];
-        var counter = 0;
-        async.eachSeries(imageUrlsForSlack, function(imageUrl, cb){
+          var productsForSlack = [];
+          var counter = 0;
+          async.eachSeries(imageUrlsForSlack, function(imageUrl, cb){
             addProductDataToArray(productsForSlack, counter++, imageUrl, completeProductsHrefs, cb);
-        }, function(){
-          console.log('done');
-          callback(null, productsForSlack);
+          }, function(){
+            console.log('done');
+            callback(null, productsForSlack);
+          });
         });
       });
-    });
-  }
-};
+    }
+  };
 
-var addProductDataToArray = function(arrayForProducts, counter, urlsForSlack, productsLinks, callback){
-  function productDataForSlack(id, cloudinaryUrl, productLink)
-  {
-    this.id = id;
-    this.imgUrl = cloudinaryUrl;
-    this.productLink = productLink;
+  var addProductDataToArray = function(arrayForProducts, counter, urlsForSlack, productsLinks, callback){
+    function productDataForSlack(id, cloudinaryUrl, productLink)
+    {
+      this.id = id;
+      this.imgUrl = cloudinaryUrl;
+      this.productLink = productLink;
+    }
+    arrayForProducts.push(new productDataForSlack(counter, urlsForSlack, productsLinks[counter]));
+    callback();
   }
-  arrayForProducts.push(new productDataForSlack(counter, urlsForSlack, productsLinks[counter]));
-  callback();
-}
