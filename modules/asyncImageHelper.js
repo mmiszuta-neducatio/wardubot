@@ -5,6 +5,8 @@ var async = require("async");
 var imageHelper = require("../lib/imageHelper.js");
 var fs = require("fs");
 
+
+
 module.exports = {
   downloadAll: function(productsImageLinks, cb){
     var counter = 0;
@@ -20,5 +22,16 @@ module.exports = {
       console.log('.');
       imageHelper.editImages(counter++, productsPricesTotal, callback);
     }, cb);
+  },
+  addProductDataToArray: function(arrayForProducts, counter, urlsForSlack, productsLinks, callback){
+    function productDataForSlack(id, cloudinaryUrl, productLink)
+    {
+      this.id = id;
+      this.imgUrl = cloudinaryUrl;
+      this.productLink = productLink;
+    }
+    arrayForProducts.push(new productDataForSlack(counter, urlsForSlack, productsLinks[counter]));
+    fs.writeFileSync('./data.json', JSON.stringify(arrayForProducts, null,2),'utf-8');
+    callback();
   }
 };

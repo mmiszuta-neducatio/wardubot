@@ -8,6 +8,7 @@ var scrapeHelper      = require("../lib/scrapeHelper.js");
 var imageHelper       = require("../lib/imageHelper.js");
 var asyncImageHelper  = require("./asyncImageHelper.js");
 var uploader          = require("../lib/uploader.js");
+var fs                = require("fs");
 
 
 
@@ -72,23 +73,12 @@ module.exports = {
           var productsForSlack = [];
           var counter = 0;
           async.eachSeries(imageUrlsForSlack, function(imageUrl, cb){
-            addProductDataToArray(productsForSlack, counter++, imageUrl, completeProductsHrefs, cb);
+            asyncImageHelper.addProductDataToArray(productsForSlack, counter++, imageUrl, completeProductsHrefs, cb);
           }, function(){
             console.log('done');
-            callback(null, productsForSlack);
+            callback();
           });
         });
       });
     }
   };
-
-  var addProductDataToArray = function(arrayForProducts, counter, urlsForSlack, productsLinks, callback){
-    function productDataForSlack(id, cloudinaryUrl, productLink)
-    {
-      this.id = id;
-      this.imgUrl = cloudinaryUrl;
-      this.productLink = productLink;
-    }
-    arrayForProducts.push(new productDataForSlack(counter, urlsForSlack, productsLinks[counter]));
-    callback();
-  }
