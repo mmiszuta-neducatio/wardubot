@@ -12,18 +12,17 @@ var fs                = require("fs");
 
 
 
-
 module.exports = {
   preparationRequest: function(callback){
-    var baseUrl = 'http://www.biedronka.pl';
+    var baseUrl = "http://www.biedronka.pl";
     tinyreq(baseUrl, function(err, body){
 
       var completePromotionsLinks = [];
       if(err) {throw err;}
       var $ = cheerio.load(body);
-      var incompletePromotionsLinks = scrapeHelper.getAttribute($, $("a[title=\"Akcje Tematyczne\"]").next().find('a'), "href");
-      var promotionsTexts = scrapeHelper.getText($, $("a[title=\"Akcje Tematyczne\"]").next().find('a'));
-      var regex = new RegExp('.*[0-9]{2}\.[0-9]{2}');
+      var incompletePromotionsLinks = scrapeHelper.getAttribute($, $("a[title=\"Akcje Tematyczne\"]").next().find("a"), "href");
+      var promotionsTexts = scrapeHelper.getText($, $("a[title=\"Akcje Tematyczne\"]").next().find("a"));
+      var regex = new RegExp(".*[0-9]{2}\.[0-9]{2}");
       for(var i = 0; i < incompletePromotionsLinks.length; i++) {
         if(regex.test(promotionsTexts[i])){
           completePromotionsLinks.push(baseUrl + incompletePromotionsLinks[i]);
@@ -33,7 +32,7 @@ module.exports = {
     });
   },
   mainRequest: function(link, callback){
-    var baseUrl = 'http://www.biedronka.pl';
+    var baseUrl = "http://www.biedronka.pl";
     tinyreq(link, function(err, body){
       if(err) {throw err;}
       var $ = cheerio.load(body);
@@ -54,28 +53,28 @@ module.exports = {
 
       async.series([
         function(next){
-          console.log('Downloading images, please wait');
+          console.log("Downloading images, please wait");
           asyncImageHelper.downloadAll(productsImageLinks, next);
         },
         function(next){
-          console.log('creating price bars');
+          console.log("creating price bars");
           imageHelper.createRectangle(next);
         },
         function(next){
-          console.log('creating images with price bars');
+          console.log("creating images with price bars");
           asyncImageHelper.editAll(productsPricesTotal, next);
         },
         function(next){
           uploader.cloudUpload(next);
         }],
         function(imageUrlsForSlack){
-
+          console.log(imageUrlsForSlack);
           var productsForSlack = [];
           var counter = 0;
           async.eachSeries(imageUrlsForSlack, function(imageUrl, cb){
             asyncImageHelper.addProductDataToArray(productsForSlack, counter++, imageUrl, completeProductsHrefs, cb);
           }, function(){
-            console.log('done');
+            console.log("done");
             callback();
           });
         });

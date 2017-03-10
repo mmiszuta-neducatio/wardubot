@@ -24,13 +24,13 @@ module.exports = {
     }, cb);
   },
   addProductDataToArray: function(arrayForProducts, counter, urlsForSlack, productsLinks, callback){
-    function productDataForSlack(id, cloudinaryUrl, productLink)
+    function ProductDataForSlack(id, cloudinaryUrl, productLink)
     {
       this.id = id;
       this.imgUrl = cloudinaryUrl;
       this.productLink = productLink;
     }
-    arrayForProducts.push(new productDataForSlack(counter, urlsForSlack, productsLinks[counter]));
+    arrayForProducts.push(new ProductDataForSlack(counter, urlsForSlack, productsLinks[counter]));
     fs.writeFileSync('./data.json', JSON.stringify(arrayForProducts, null,2),'utf-8');
     callback();
   }

@@ -1,3 +1,4 @@
+/*jslint node: true */
 'use strict';
 
 var schedule  = require('node-schedule');
@@ -14,11 +15,13 @@ dataUpdateSchedule.dayOfWeek = [1,4];
 dataUpdateSchedule.hour = 8;
 dataUpdateSchedule.minute = 20;
 
+
+console.log('application initialized. Scheduled jobs will start at specific time. Please do not close the app!');
 schedule.scheduleJob(dataUpdateSchedule, function(){
-data.updateForSlack();
+  data.updateForSlack();
 });
 
 
- schedule.scheduleJob(launchingMessagesSchedule, function(){
+schedule.scheduleJob(launchingMessagesSchedule, function(){
   wardubot.sendMessages();
 });
