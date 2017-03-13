@@ -32,6 +32,6 @@ module.exports = {
     }
     arrayForProducts.push(new ProductDataForSlack(counter, urlsForSlack, productsLinks[counter]));
     fs.writeFileSync('./data.json', JSON.stringify(arrayForProducts, null,2),'utf-8');
-    callback();
+    callback(null, arrayForProducts);
   }
 };

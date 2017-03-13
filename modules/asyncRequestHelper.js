@@ -8,7 +8,7 @@ var scrapeHelper      = require("../lib/scrapeHelper.js");
 var imageHelper       = require("../lib/imageHelper.js");
 var asyncImageHelper  = require("./asyncImageHelper.js");
 var uploader          = require("../lib/uploader.js");
-var fs                = require("fs");
+
 
 
 
@@ -68,7 +68,6 @@ module.exports = {
           uploader.cloudUpload(next);
         }],
         function(imageUrlsForSlack){
-          console.log(imageUrlsForSlack);
           var productsForSlack = [];
           var counter = 0;
           async.eachSeries(imageUrlsForSlack, function(imageUrl, cb){
