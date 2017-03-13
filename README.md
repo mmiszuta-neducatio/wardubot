@@ -18,9 +18,10 @@ environment:
 you will find slack token on your team Apps & Integrations page
 for Cloudinary you need to copy paste them from your profile page (it's visible on the dashboard)
 
-then you can
-```docker-compose up
-   docker exec -ti node-wardubot bash```
+then you can:
+```docker-compose up -d```
+and when it's running:
+```docker exec -ti node-wardubot bash```
 
 install modules:
 ```npm install```
