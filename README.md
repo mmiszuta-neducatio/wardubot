@@ -20,13 +20,15 @@ for Cloudinary you need to copy paste them from your profile page (it's visible 
 
 then you can:
 ```docker-compose up -d```
+
 and when it's running:
+
 ```docker exec -ti node-wardubot bash```
 
 install modules:
 ```npm install```
 
-run application from terminal (in main project folder):
+run application from container's terminal (in main project folder):
 ```node app.js```
 
 and check what you can buy in biedronka for good prices!

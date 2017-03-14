@@ -5,12 +5,13 @@ services:
     container_name: node-wardubot
     image: node:latest
     environment:
-      - SLACKBOT_TOKEN=
-      - CLOUDINARY_NAME=
-      - CLOUDINARY_KEY=
-      - CLOUDINARY_SECRET=
+      - SLACKBOT_TOKEN=xoxb-147510149990-8gMO94IOGO4U48EXLSipbvq4
+      - CLOUDINARY_NAME=doj3kuv7g
+      - CLOUDINARY_KEY=587251674318611
+      - CLOUDINARY_SECRET=lrQYj59WR4nBLeqVybzYcLImvL0
     volumes:
-      - ".:/wardubot"
+      - ".:/wardubot" 
     working_dir: /wardubot
+    command: bash -c "npm install &&  npm install -g forever && forever start app.js"
     tty: true
     stdin_open: true
