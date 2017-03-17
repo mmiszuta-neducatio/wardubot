@@ -12,6 +12,6 @@ services:
     volumes:
       - ".:/wardubot" 
     working_dir: /wardubot
-    command: bash -c "npm install &&  npm install -g forever && forever start app.js && tail -f /dev/null"
+    command: bash -c "npm install &&  npm install -g forever && forever app.js"
     tty: true
     stdin_open: true
