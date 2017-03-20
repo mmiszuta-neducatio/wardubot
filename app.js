@@ -21,6 +21,6 @@ schedule.scheduleJob(dataUpdateSchedule, function () {
 
 
 
-schedule.scheduleJob(launchingMessagesSchedule, function () {
+//schedule.scheduleJob(launchingMessagesSchedule, function () {
   wardubot.sendMessages();
-});
+//});

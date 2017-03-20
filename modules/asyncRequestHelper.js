@@ -9,6 +9,7 @@ var imageHelper = require('../lib/imageHelper.js');
 var asyncImageHelper = require('./asyncImageHelper.js');
 var uploader = require('../lib/uploader.js');
 var fs = require('fs');
+var wardubot = require('../lib/wardubot.js');
 
 module.exports = {
   preparationRequest: function (callback) {
@@ -16,6 +17,7 @@ module.exports = {
     tinyreq(baseUrl, function (err, body) {
       if (err) {
         console.error(err);
+        wardubot.tellIfSomethingWentWrong(err);
       }
       var i = 0;
       var completePromotionsLinks = [];
@@ -44,6 +46,7 @@ module.exports = {
     tinyreq(link, function (err, body) {
       if (err) {
         console.error(err);
+        wardubot.tellIfSomethingWentWrong(err);
       }
       var i = 0;
       var $ = cheerio.load(body);
@@ -53,6 +56,7 @@ module.exports = {
       var productsImageLinks = scrapeHelper.getAttribute($, $('.productsimple-default img'), 'src');
       if (0 === productsImageLinks.length) {
         productsImageLinks = scrapeHelper.getAttribute($, $('.product img'), 'src');
+        incompleteProductsHrefs = scrapeHelper.getAttribute($, $('.product a'), 'href');
         productsPricesTotal = scrapeHelper.getText($, $('.price'));
       } else {
         var productsPricesPln = scrapeHelper.getText($, $('.pln'));
