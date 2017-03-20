@@ -15,11 +15,11 @@ launchingMessagesSchedule.hour      = 10;
 launchingMessagesSchedule.minute    = 20;
 
 console.log('application initialized. Scheduled jobs will start at specific time. Please do not close the app!');
-//schedule.scheduleJob(dataUpdateSchedule, function () {
+schedule.scheduleJob(dataUpdateSchedule, function () {
   data.updateForSlack();
-//});
-
-
-schedule.scheduleJob(launchingMessagesSchedule, function () {
-  wardubot.sendMessages();
 });
+
+
+//schedule.scheduleJob(launchingMessagesSchedule, function () {
+  wardubot.sendMessages();
+//});

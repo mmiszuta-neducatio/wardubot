@@ -8,16 +8,8 @@ var scrapeHelper = require('../lib/scrapeHelper.js');
 var imageHelper = require('../lib/imageHelper.js');
 var asyncImageHelper = require('./asyncImageHelper.js');
 var uploader = require('../lib/uploader.js');
+var fs = require('fs');
 
-var addProductDataToArray = function (arrayForProducts, counter, urlsForSlack, productsLinks, callback) {
-  function ProductDataForSlack(id, cloudinaryUrl, productLink) {
-    this.id = id;
-    this.imgUrl = cloudinaryUrl;
-    this.productLink = productLink;
-  }
-  arrayForProducts.push(new ProductDataForSlack(counter, urlsForSlack, productsLinks[counter]));
-  callback();
-};
 
 module.exports = {
   preparationRequest: function (callback) {
@@ -81,8 +73,8 @@ module.exports = {
             asyncImageHelper.downloadAll(productsImageLinks, next);
           },
           function (next) {
-            console.log('creating price bars');
-            imageHelper.createRectangle('./images/bars', next);
+            console.log('creating price bar');
+            imageHelper.createRectangle('./images/bars/yellowBar.png', next);
           },
           function (next) {
             console.log('creating images with price bars');
@@ -96,7 +88,7 @@ module.exports = {
           var productsForSlack = [];
           var counter = 0;
           async.eachSeries(imageUrlsForSlack, function (imageUrl, cb) {
-              addProductDataToArray(productsForSlack, counter++, imageUrl, productsHrefs, cb);
+              asyncImageHelper.addProductDataToArray(productsForSlack, counter++, imageUrl, productsHrefs, cb);
             },
             function () {
               console.log('done');
