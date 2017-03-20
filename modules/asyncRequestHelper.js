@@ -9,6 +9,7 @@ var imageHelper = require('../lib/imageHelper.js');
 var asyncImageHelper = require('./asyncImageHelper.js');
 var uploader = require('../lib/uploader.js');
 var fs = require('fs');
+var wardubot = require('../lib/wardubot.js');
 
 
 module.exports = {
@@ -17,6 +18,7 @@ module.exports = {
     tinyreq(baseUrl, function (err, body) {
       if (err) {
         console.error(err);
+        wardubot.tellIfSomethingWentWrong(err);
       }
       var i = 0;
       var completePromotionsLinks = [];
@@ -45,6 +47,7 @@ module.exports = {
     tinyreq(link, function (err, body) {
       if (err) {
         console.error(err);
+        wardubot.tellIfSomethingWentWrong(err);
       }
       var i = 0;
       var $ = cheerio.load(body);
