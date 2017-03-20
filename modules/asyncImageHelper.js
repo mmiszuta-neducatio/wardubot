@@ -1,3 +1,4 @@
+/*jslint node: true */
 'use strict';
 
 var async       = require('async');
@@ -22,16 +23,16 @@ module.exports = {
   editAll: function (productsPricesTotal, cb) {
     var rawImages = fs.readdirSync('./images/raw/');
     var counter   = 0;
-    async.eachSeries(rawImages, function (rawImageName, callback) {
+    async.eachSeries(rawImages, function(rawImageName, callback){
       console.log('.');
-      imageHelper.editImages(counter++, productsPricesTotal, callback);
+      imageHelper.editImages('./images/raw', './images/bars/yellowBar.png', './images/imagesWithPrice', counter++, productsPricesTotal, callback);
     }, cb);
   },
   addProductDataToArray: function (arrayForProducts, counter, urlsForSlack, productsLinks, callback) {
     function ProductDataForSlack(id, cloudinaryUrl, productLink) {
-      this.id           = id;
-      this.imgUrl       = cloudinaryUrl;
-      this.productLink  = productLink;
+      this.id = id;
+      this.imgUrl = cloudinaryUrl;
+      this.productLink = productLink;
     }
     arrayForProducts.push(new ProductDataForSlack(counter, urlsForSlack, productsLinks[counter]));
     fs.writeFileSync('./data.json', JSON.stringify(arrayForProducts, null, 2), 'utf-8');

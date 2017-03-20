@@ -17,6 +17,7 @@
     "jimp": "^0.2.27",
     "node-schedule": "^1.2.0",
     "request": "^2.79.0",
+    "shelljs": "^0.7.7",
     "slackbots": "^1.0.2",
     "tinyreq": "^3.2.0"
   },
