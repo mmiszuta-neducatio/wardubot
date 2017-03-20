@@ -11,7 +11,6 @@ var uploader = require('../lib/uploader.js');
 var fs = require('fs');
 var wardubot = require('../lib/wardubot.js');
 
-
 module.exports = {
   preparationRequest: function (callback) {
     var baseUrl = 'http://www.biedronka.pl';
