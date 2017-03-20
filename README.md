@@ -1,18 +1,25 @@
 # wardubot
-slack bot for polish discount stores newsletters
+slack bot for polish discount store: biedronka
 
+go to project directory and
 
--> ściągnąć zdjęcia produktów, ich cen i linku z biedonka.pl
-  - download image for 1 product
-  - parse its price
-  - parse its link
--> zapisać w taki sposób, by wszystko było widoczne na 1 zdjęciu
-  - merge all the data to one single image. (preferably clickable)
--> zapisać w bazie danych MongoDB
-  - make images available in database for bot to take
--> stworzyć bota, który 'weźmie' obraz i wrzuci go na slacka
-  - create a bot
-  - connect it to the slack
-  - make it upload the file to one of the channels
--> skonfigurować crona, żeby o jednej porze codziennie pobierał dane z biedronka.pl
-  - think about if app should check that images are not the same as yesterday
+**before** you will:
+```docker-compose up```
+
+open docker-compose.yml and provide your credentials for both slack bot and cloudinary as environment variables:
+```    
+environment:
+  - SLACKBOT_TOKEN=
+  - CLOUDINARY_NAME=
+  - CLOUDINARY_KEY=
+  - CLOUDINARY_SECRET=
+```
+
+you will find slack token on your team Apps & Integrations page
+for Cloudinary you need to copy paste them from your profile page (it's visible on the dashboard)
+
+then you can:
+```docker-compose up -d```
+
+and on slack you will see what to buy in biedronka for good prices!
+happy shopping!

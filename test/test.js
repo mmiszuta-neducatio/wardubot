@@ -1,5 +1,4 @@
 'use strict';
-// TODO make fullpath to create needed directories
 
 var testImageHelper   = require('../lib/imageHelper.js');
 var fs                = require('fs');

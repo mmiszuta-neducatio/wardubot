@@ -10,7 +10,6 @@ var asyncImageHelper = require('./asyncImageHelper.js');
 var uploader = require('../lib/uploader.js');
 var fs = require('fs');
 
-
 module.exports = {
   preparationRequest: function (callback) {
     var baseUrl = 'http://www.biedronka.pl';

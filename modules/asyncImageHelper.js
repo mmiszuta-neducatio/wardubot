@@ -6,9 +6,8 @@ var imageHelper = require('../lib/imageHelper.js');
 var fs          = require('fs');
 
 module.exports = {
-  downloadAll: function(productsImageLinks, cb){
+  downloadAll: function (productsImageLinks, cb) {
     var counter = 0;
-
     async.eachSeries(productsImageLinks, function (link, callback) {
       var pathToRawImage = './images/raw/rawImage' + counter++ + '.jpg';
       imageHelper.downloadImage({
@@ -21,7 +20,7 @@ module.exports = {
       }, pathToRawImage, callback);
     }, cb);
   },
-  editAll: function(productsPricesTotal, cb){
+  editAll: function (productsPricesTotal, cb) {
     var rawImages = fs.readdirSync('./images/raw/');
     var counter   = 0;
     async.eachSeries(rawImages, function(rawImageName, callback){
