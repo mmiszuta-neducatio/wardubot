@@ -56,7 +56,7 @@ module.exports = {
       var productsImageLinks = scrapeHelper.getAttribute($, $('.productsimple-default img'), 'src');
       if (0 === productsImageLinks.length) {
         productsImageLinks = scrapeHelper.getAttribute($, $('.product img'), 'src');
-        incompleteProductsHrefs = scrapeHelper.getAttribute($, $('.product a'), 'href');
+        incompleteProductsHrefs = scrapeHelper.getAttribute($, $('.info'), 'href');
         productsPricesTotal = scrapeHelper.getText($, $('.price'));
       } else {
         var productsPricesPln = scrapeHelper.getText($, $('.pln'));
