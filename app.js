@@ -6,20 +6,16 @@ var wardubot  = require('./lib/wardubot.js');
 
 var dataUpdateSchedule        = new schedule.RecurrenceRule();
 dataUpdateSchedule.dayOfWeek  = [1,4];
-dataUpdateSchedule.hour       = 8;
+dataUpdateSchedule.hour       = 6;
 dataUpdateSchedule.minute     = 20;
 
 var launchingMessagesSchedule       = new schedule.RecurrenceRule();
 launchingMessagesSchedule.dayOfWeek = [1,2,3,4,5,6,7];
-launchingMessagesSchedule.hour      = 11;
-launchingMessagesSchedule.minute    = 12;
+launchingMessagesSchedule.hour      = 7;
+launchingMessagesSchedule.minute    = 40;
 
 //when it starts it needs to get images to start working.
 data.updateForSlack();
-
-setTimeout(function () {
-  wardubot.sendMessages();
-}, 10000);
 
 console.log('application initialized. Scheduled jobs will start at specific time. Please do not close the app!');
 schedule.scheduleJob(dataUpdateSchedule, function () {

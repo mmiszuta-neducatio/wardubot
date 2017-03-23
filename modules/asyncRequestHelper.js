@@ -8,8 +8,6 @@ var scrapeHelper = require('../lib/scrapeHelper.js');
 var imageHelper = require('../lib/imageHelper.js');
 var asyncImageHelper = require('./asyncImageHelper.js');
 var uploader = require('../lib/uploader.js');
-var fs = require('fs');
-var wardubot = require('../lib/wardubot.js');
 var shell = require('shelljs');
 
 module.exports = {
@@ -18,7 +16,6 @@ module.exports = {
     tinyreq(baseUrl, function (err, body) {
       if (err) {
         console.error(err);
-        wardubot.tellIfSomethingWentWrong(err);
       }
       shell.rm('-rf', './images/raw/*');
       shell.rm('-rf', './images/imagesWithPrice/*');
@@ -49,7 +46,6 @@ module.exports = {
     tinyreq(link, function (err, body) {
       if (err) {
         console.error(err);
-        wardubot.tellIfSomethingWentWrong(err);
       }
       var i = 0;
       var $ = cheerio.load(body);
@@ -70,16 +66,13 @@ module.exports = {
       }
       for(i = productsImageLinks.length - 1; i >= 0; i--) {
         if(productsImageLinks[i].includes('static')) {
-          console.log(productsImageLinks[i]);
-          console.log(i);
           productsImageLinks.splice(i, 1);
         }
       }
       for (i = 0; i < incompleteProductsHrefs.length; i++) {
         productsHrefs.push(baseUrl + incompleteProductsHrefs[i]);
       }
-      console.log(productsImageLinks);
-      console.log(productsPricesTotal);
+
       async.series([
           function (next) {
             console.log('Downloading images, please wait');
