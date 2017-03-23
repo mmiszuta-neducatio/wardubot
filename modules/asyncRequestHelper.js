@@ -10,6 +10,7 @@ var asyncImageHelper = require('./asyncImageHelper.js');
 var uploader = require('../lib/uploader.js');
 var fs = require('fs');
 var wardubot = require('../lib/wardubot.js');
+var shell = require('shelljs');
 
 module.exports = {
   preparationRequest: function (callback) {
@@ -19,6 +20,8 @@ module.exports = {
         console.error(err);
         wardubot.tellIfSomethingWentWrong(err);
       }
+      shell.rm('-rf', './images/raw/*');
+      shell.rm('-rf', './images/imagesWithPrice/*');
       var i = 0;
       var completePromotionsLinks = [];
       var $ = cheerio.load(body);
@@ -59,17 +62,24 @@ module.exports = {
         incompleteProductsHrefs = scrapeHelper.getAttribute($, $('.info'), 'href');
         productsPricesTotal = scrapeHelper.getText($, $('.price'));
       } else {
-        var productsPricesPln = scrapeHelper.getText($, $('.pln'));
-        var productsPricesGr = scrapeHelper.getText($, $('.gr'));
+        var productsPricesPln = scrapeHelper.getText($, $('span[class="pln"]:not(.price-old)'));
+        var productsPricesGr = scrapeHelper.getText($, $('span[class="gr"]:not(.price-old)'));
         for (i = 0; i < productsPricesPln.length; i++) {
           productsPricesTotal.push(productsPricesPln[i] + ',' + productsPricesGr[i] + ' pln');
         }
       }
-
+      for(i = productsImageLinks.length - 1; i >= 0; i--) {
+        if(productsImageLinks[i].includes('static')) {
+          console.log(productsImageLinks[i]);
+          console.log(i);
+          productsImageLinks.splice(i, 1);
+        }
+      }
       for (i = 0; i < incompleteProductsHrefs.length; i++) {
         productsHrefs.push(baseUrl + incompleteProductsHrefs[i]);
       }
-
+      console.log(productsImageLinks);
+      console.log(productsPricesTotal);
       async.series([
           function (next) {
             console.log('Downloading images, please wait');

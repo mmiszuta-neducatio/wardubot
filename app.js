@@ -17,6 +17,10 @@ launchingMessagesSchedule.minute    = 12;
 //when it starts it needs to get images to start working.
 data.updateForSlack();
 
+setTimeout(function () {
+  wardubot.sendMessages();
+}, 10000);
+
 console.log('application initialized. Scheduled jobs will start at specific time. Please do not close the app!');
 schedule.scheduleJob(dataUpdateSchedule, function () {
   data.updateForSlack();
